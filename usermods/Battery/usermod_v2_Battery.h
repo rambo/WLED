@@ -89,7 +89,18 @@ class UsermodBattery : public Usermod
     {
       bri = 0;
       stateUpdated(CALL_MODE_DIRECT_CHANGE);
-    }
+
+// FIXME: There must be a better way so this is done after the relay etc are turned off correctly
+#ifdef USERMOD_BATTERY_LOW_BAT_HIBERNATE
+#ifdef ARDUINO_ARCH_ESP32
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH,   ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_SLOW_MEM, ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_FAST_MEM, ESP_PD_OPTION_OFF);
+    esp_sleep_pd_config(ESP_PD_DOMAIN_XTAL,         ESP_PD_OPTION_OFF);
+    esp_deep_sleep_start();
+#endif
+#endif
+        }
 
     /*
      * Indicate low power by activating a configured preset for a given time and then switching back to the preset that was selected previously
